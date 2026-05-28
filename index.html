@@ -1121,29 +1121,59 @@ function toggleCart() {
 }
 
 // SUBMIT
-function submitOrder() {
+async function submitOrder() {
   const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
   const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim();
   const project = document.getElementById('project').value;
+  const area = document.getElementById('area').value;
   const location = document.getElementById('location').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+
   if (!fname || !phone || !project || !location) {
-    alert('Please fill in all required fields (marked with *).');
+    alert('Please fill in all required fields.');
     return;
   }
-  document.querySelector('.submit-btn').style.display = 'none';
-  document.getElementById('successMsg').style.display = 'block';
 
   const cartSummary = cart.length > 0
-    ? cart.map(c=>`${c.name}: ${c.qty} ${c.unit}`).join(', ')
+    ? cart.map(c => `${c.name}: ${c.qty} ${c.unit}`).join(', ')
     : 'No specific products selected';
 
-  console.log('Order Submitted:', {
-    name: fname + ' ' + document.getElementById('lname').value,
-    phone, email: document.getElementById('email').value,
-    project, area: document.getElementById('area').value,
-    location, notes: document.getElementById('notes').value,
+  const orderData = {
+    name: fname + ' ' + lname,
+    phone,
+    email,
+    project,
+    area,
+    location,
+    notes,
     cart: cartSummary
-  });
+  };
+
+  try {
+    console.log("Sending order to backend...", orderData);
+    const response = await fetch('https://saha-backend-kgem.onrender.com/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      document.querySelector('.submit-btn').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    } else {
+      alert('Order could not be submitted.');
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert('Backend server not running.');
+  }
 }
 
 // REVEAL ON SCROLL
