@@ -1167,7 +1167,7 @@ async function submitOrder() {
       document.querySelector('.submit-btn').style.display = 'none';
       document.getElementById('successMsg').style.display = 'block';
     } else {
-      alert('Order could not be submitted.');
+      alert(result.message || 'Order could not be submitted.');
     }
 
   } catch (error) {
